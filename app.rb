@@ -14,18 +14,12 @@ class Application < Sinatra::Base
     also_reload 'lib/artist_repository'
   end
 
-  # get '/albums' do
-  #   repo = AlbumRepository.new
-  #   albums = repo.all
-
-  #   response = albums.map do |album|
-  #     album.title
-  #   end.join(', ')
-    
-  #   return response
-  # end
-
   post '/albums' do
+    if invalid_request_parameters?
+      status 400
+      return ''
+    end
+
     repo = AlbumRepository.new
     new_album = Album.new
     new_album.title = params[:title]
@@ -37,18 +31,16 @@ class Application < Sinatra::Base
     return ''
   end
 
-  # get '/artists' do
-  #   repo = ArtistRepository.new
-  #   artists = repo.all
-
-  #   expected_response = artists.map do |artist|
-  #     artist.name
-  #   end.join(', ')
-    
-  #   return expected_response
-  # end
+  def invalid_request_parameters?
+    return (params[:title] == nil || params[:release_year] == nil || params[:artist_id] == nil)
+  end
 
   post '/artists' do
+    if invalid_request_params?
+      status 400
+      return ''
+    end
+
     repo = ArtistRepository.new
     new_artist = Artist.new
     new_artist.name = params[:name]
@@ -57,6 +49,18 @@ class Application < Sinatra::Base
     repo.create(new_artist)
 
     return ''
+  end
+
+  def invalid_request_params?
+    return (params[:name] == nil || params[:genre] == nil)
+  end
+
+  get '/artists/new' do
+    return erb(:new_artist)
+  end
+
+  get '/albums/new' do
+    return erb(:new_album)
   end
 
   get '/albums/:id' do

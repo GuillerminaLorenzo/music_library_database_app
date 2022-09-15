@@ -21,18 +21,14 @@ describe Application do
   # class so our tests work.
   let(:app) { Application.new }
 
-  # context 'GET /albums' do
-  #   it 'gets a list of all the albums' do
-  #     response = get('/albums')
-
-  #     expected_response = 'Doolittle, Surfer Rosa, Waterloo, Super Trouper, Bossanova, Lover, Folklore, I Put a Spell on You, Baltimore, Here Comes the Sun, Fodder on My Wings, Ring Ring'
-
-  #     expect(response.status).to eq (200)
-  #     expect(response.body).to eq (expected_response)
-  #   end
-  # end
 
   context 'POST /albums' do
+    it 'should validate album parameters' do
+      response = post('/albums', invalid_album_title: 'Voyage', another_invalid_thing: 123)
+
+      expect(response.status).to eq 400
+    end
+
     it 'creates a new album' do
       response = post(
         '/albums',
@@ -50,18 +46,13 @@ describe Application do
     end
   end
 
-  # context 'GET /artists' do
-  #   it 'gets a list of all the artists' do
-  #     response = get('/artists')
-
-  #     expected_response = ('Pixies, ABBA, Taylor Swift, Nina Simone')
-
-  #     expect(response.status).to eq 200
-  #     expect(response.body).to eq ('Pixies, ABBA, Taylor Swift, Nina Simone')
-  #   end
-  # end
-
   context 'POST /artists' do
+    it 'should validate artist parameters' do
+      response = post('/artists', invalid_artist_title: 'Wild nothing', another_invalid_thing: 123)
+
+      expect(response.status).to eq 400
+    end
+
     it 'creates a new artist' do 
       response = post(
         '/artists',
@@ -77,15 +68,6 @@ describe Application do
     end
   end
 
-  context 'GET /albums/:id' do
-    it ' ' do
-      response = get('/albums/2')
-
-      expect(response.status).to eq 200
-      expect(response.body).to include('<h1>Surfer Rosa</h1>')
-    end
-  end
-
   context 'GET /albums' do
     it '' do
       response = get('/albums')
@@ -97,13 +79,24 @@ describe Application do
     end
   end
 
-  context "GET /artists/:id" do
-    it "returns artists according to id" do
-      response = get('/artists/2')
+  context 'GET /albums/new' do
+    it 'form to add a new album' do
+      response = get('/albums/new')
 
       expect(response.status).to eq 200
-      expect(response.body).to include('ABBA')
-      expect(response.body).to include('Pop')
+      expect(response.body).to include('<form method="POST" action="/albums">')
+      expect(response.body).to include('<input type="text" name="title" />')
+      expect(response.body).to include('<input type="text" name="release_year" />')
+      expect(response.body).to include('<input type="text" name="artist_id" />')
+    end
+  end
+
+  context 'GET /albums/:id' do
+    it ' ' do
+      response = get('/albums/2')
+
+      expect(response.status).to eq 200
+      expect(response.body).to include('<h1>Surfer Rosa</h1>')
     end
   end
 
@@ -118,4 +111,24 @@ describe Application do
     end
   end
 
+  context 'GET /artists/new' do
+    it 'form to add a new artist' do
+      response = get('/artists/new')
+
+      expect(response.status).to eq 200
+      expect(response.body).to include('<form method="POST" action="/artists">')
+      expect(response.body).to include('<input type="text" name="name" />')
+      expect(response.body).to include('<input type="text" name="genre" />')
+    end
+  end
+
+  context "GET /artists/:id" do
+    it "returns artists according to id" do
+      response = get('/artists/2')
+
+      expect(response.status).to eq 200
+      expect(response.body).to include('ABBA')
+      expect(response.body).to include('Pop')
+    end
+  end
 end
